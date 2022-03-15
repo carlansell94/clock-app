@@ -1,0 +1,25 @@
+name: cpp-linter
+on:
+  pull_request:
+    branches: master
+    paths: ['**.c', '**.cpp', '**.h']
+  push:
+    branches: master
+    paths: ['**.c', '**.cpp', '**.h']
+
+jobs:
+  cpp-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: 'file'
+          tidy-checks: '-*'
+
+      - name: Failure check
+        if: steps.linter.outputs.clang-format-checks-failed > 0
+        run: exit 1
